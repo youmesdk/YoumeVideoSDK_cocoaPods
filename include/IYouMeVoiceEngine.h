@@ -1,4 +1,4 @@
-﻿/**
+/**
  @file IYouMeVoiceEngine.h
  @brief 游密音频通话引擎接口
  
@@ -108,6 +108,13 @@ public:
     void setServerRegion(YOUME_RTC_SERVER_REGION regionId, const char* extRegionName, bool bAppend);
     
     /**
+     *  功能描述:设置服务器部署模式（仅私服/混合部署使用）
+     *  @param deployMode: YOUME_SERVER_DEPLOY_MODE枚举可选的部署模式
+     *  @return 无
+     */
+    void setServerDeployMode(YOUME_SERVER_DEPLOY_MODE deployMode);
+    
+    /**
      *  功能描述:切换语音输出设备
      *  默认输出到扬声器，在加入房间成功后设置（iOS受系统限制，如果已释放麦克风则无法切换到听筒）
      *
@@ -198,6 +205,17 @@ public:
     YouMeErrorCode setLocalConnectionInfo(const char* pLocalIP, int iLocalPort, const char* pRemoteIP, int iRemotePort, int iNetType);
 
     /**
+     *  功能描述:设置本地连接额外信息，用于p2p传输，本接口在join房间之前调用
+     *
+     *  @param bNoSignaling:是否通过mcu管理连接
+     *  @param iConnectTimeout:p2p建立连接过程中超时时间
+     *  @param iKeepaliveTimeout:p2p正在连接过程中超时时间
+     *
+     *  @return 错误码，详见YouMeConstDefine.h定义
+     */
+    YouMeErrorCode setLocalConnectionExtraInfo(bool bNoSignaling, int iConnectTimeout, int iKeepAliveTimeout);
+
+    /**
      *  功能描述:清除本地局域网连接信息，强制server转发
      *
      *
@@ -213,6 +231,15 @@ public:
      *  @return 错误码，详见YouMeConstDefine.h定义
      */
     YouMeErrorCode setRouteChangeFlag(bool enable);
+    
+    /**
+     *  功能描述:设置视频质量模式
+     *
+     *  @param mode: 0:流畅模式，1:高清模式; 默认流畅模式
+     *
+     *  @return 错误码，详见YouMeConstDefine.h定义
+     */
+    YouMeErrorCode setVideoQualityMode(int mode);
     
     //---------------------多人语音接口---------------------//
 
@@ -362,7 +389,7 @@ public:
     YouMeErrorCode setListenOtherVoice (const char* pUserID, bool on );
 
 	/**
-	* 功能描述: 视频数据输入，软件处理方式(七牛接口，房间内其它用户会收到YOUME_EVENT_OTHERS_VIDEO_INPUT_START事件)
+	* 功能描述: 视频数据输入，软件处理方式(外部输入接口，房间内其它用户会收到YOUME_EVENT_OTHERS_VIDEO_INPUT_START事件)
 	* @param data 视频帧数据
 	* @param len 视频数据大小
 	* @param width 视频图像宽
@@ -467,7 +494,7 @@ public:
     YouMeErrorCode stopInputVideoFrameForShare();
     
     /**
-     *  功能描述: (七牛接口)将提供的音频数据混合到麦克风或者扬声器的音轨里面。
+     *  功能描述: (外部输入接口)将提供的音频数据混合到麦克风或者扬声器的音轨里面。
      *  @param data 指向PCM数据的缓冲区
      *  @param len  音频数据的大小
      *  @param timestamp 时间戳
@@ -561,7 +588,7 @@ public:
     YouMeErrorCode setVadCallbackEnabled(bool enabled);
 
 	/**
-	*  功能描述: 设置是否开启扬声器内录功能，主要用来给主播电脑放歌并演唱后，发给听众
+	*  功能描述: 设置是否开启系统声音采集，主要用来给主播电脑放歌并演唱后，发给听众
 	*  @param enabled, true 开启内录，false 关闭内录
 	*  @return YOUME_SUCCESS - 成功
 	*          其他 - 具体错误码
@@ -569,7 +596,7 @@ public:
 	YouMeErrorCode setSpeakerRecordOn(bool enabled);
 
 	/**
-	*  功能描述: 获取当前是否已开启扬声器内录功能
+	*  功能描述: 获取当前是否已开启系统声音采集功能
 	*  @return YOUME_SUCCESS - 成功
 	*          其他 - 具体错误码
 	*/
@@ -624,6 +651,15 @@ public:
      *          其他 - 具体错误码
      */
     YouMeErrorCode setExitCommModeWhenHeadsetPlugin(bool enabled);
+
+	/**
+	 *  功能描述： 设置系统通话模式,优先级最高
+	 *   默认使用服务器后台配置项
+	 * 注：
+	 * 1. Windows和macOS不支持该接口
+	 * 2. 在初始化之后、加入房间之前调用
+	 */
+    YouMeErrorCode setCommMode(bool enabled);
 
     /**
      *  功能描述: 设置是否强制关闭软件AEC 处理,声卡内录模式播放音乐的话，戴耳机的情况下可以强制关闭，提高音乐质量
@@ -714,6 +750,12 @@ public:
     /**
      *  功能描述:获取SDK 版本号
      *
+     *  @return 版本号(字符串)
+     */
+    const char* getSdkVersion ();
+
+    /**
+     *  功能描述:获取SDK 版本号 （待废弃）
      *
      *  @return 整形数字版本号
      */
@@ -1024,14 +1066,6 @@ public:
     YouMeErrorCode setVideoSmooth( int enable );
 
     /**
-     *  功能描述: 设置视频暂停编码
-     *  @param enable: 0: 正常编码；1: 暂停编码
-     *  @return YOUME_SUCCESS - 成功
-     *          其他 - 具体错误码
-     */
-    YouMeErrorCode setVideoPauseEncodec(bool enable);
-
-    /**
      *  功能描述: 设置视频上行server反馈
      *  @param mode: 0: 关闭；1: 打开
      *  @return YOUME_SUCCESS - 成功
@@ -1075,19 +1109,61 @@ public:
     YouMeErrorCode setVideoNetResolutionForShare( int width, int height );
 
     /**
+     * 功能描述 添加一个simulcast分辨率,当添加第一个的时候,大小流功能失效,用这个来代替大小流
+     * 
+     * @param width:宽 
+     * @param height:高
+     * @return YOUME_SUCCESS - 成功
+     *          其它 - 具体错误码
+     */
+    YouMeErrorCode addVideoSimulcastResolution(int width, int height);
+
+    /**
+     * 功能描述 关闭simulcast功能
+     * 
+     * @return YouMeErrorCode 
+     */
+    YouMeErrorCode clearVideoSimulcastResolution();
+
+    /**
+     * 功能描述 添加一个共享流simulcast分辨率,当添加第一个的时候,大小流功能失效,用这个来代替大小流
+     * 
+     * @param width:宽 
+     * @param height:高
+     * @return YOUME_SUCCESS - 成功
+     *          其它 - 具体错误码
+     */
+    YouMeErrorCode addShareSimulcastResolution(int width, int height);
+
+    /**
+     * 功能描述 关闭共享流simulcast功能
+     * 
+     * @return YouMeErrorCode 
+     */
+    YouMeErrorCode clearShareSimulcastResolution();
+
+    /**
      *  功能描述: 设置音视频统计数据时间间隔
      *  @param interval: 时间间隔，单位毫秒
      */
     void setAVStatisticInterval( int interval  );
     
     /**
-     *  功能描述: 设置Audio,Video的统计数据的回调接口
+     *  功能描述: 设置Audio,Video的统计数据的回调接口（待废弃，建议使用新接口）
      *  @param cb: 需要继承IYouMeAVStatisticCallback并实现其中的回调函数
      *
      *  @return None
      */
     void setAVStatisticCallback( IYouMeAVStatisticCallback* cb );
-    
+
+    /**
+     *  功能描述: 设置Audio,Video的统计数据的回调接口(新接口)
+     *  @param cb: 需要继承IYouMeAVStatistiNewcCallback并实现其中的回调函数
+     *
+     *  @return None
+     */
+    void setAVStatisticNewCallback( IYouMeAVStatisticNewCallback* cb );
+
     /**
      *  功能描述: 设置Audio的传输质量
      *  @param quality: 0: low 1: high
@@ -1210,7 +1286,8 @@ public:
      struct userVideoInfo
      {
          std::string userId;
-         int resolutionType;   //支持分辨率, 0:大流，1:小流
+         int resolutionType;   //支持分辨率, 0:大流，1:小流， 2:共享流
+         int bitResolutionType; // 位域，0取消订阅, 1:0流 2:1流 4:2流, 可组合
      };
     
     /**
@@ -1306,9 +1383,16 @@ public:
      *  @param  index:列表中的位置
      *  @param  deviceName:设备名称
      *  @param  deviceUid:设备唯一ID，用于设置设备
-     *  @return bool - 成功:非空name 失败:空字符串
+     *  @return bool - true 成功
      */
     bool getRecordDeviceInfo(int index, char deviceName[MAX_DEVICE_ID_LENGTH], char deviceUId[MAX_DEVICE_ID_LENGTH]);
+
+	/**
+	 *  功能描述: 获取windows/macos平台 正在使用的record设备 对应信息
+	 *  @param  deviceUid:设备唯一ID，用于设置设备
+	 *  @return bool - true 成功
+	 */
+	bool getCurrentRecordDeviceInfo(char* deviceUId);
     
     /**
      *  功能描述: 设置windows/macos平台打开录音设备id
@@ -1506,6 +1590,13 @@ public:
      *          其他 - 具体错误码
      */
     YouMeErrorCode startSaveScreen(const char* filePath, HWND renderHandle, HWND captureHandle);
+
+    /**
+     * 共享屏幕、共享窗口时，绘制边框的开关；在开始共享前调用
+     * @param bEnable:true,共享时绘制边框；false，共享时，不绘制边框
+     * @return 无返回码
+     */
+    void enableShareBorder(bool bEnable);
     
 #elif MAC_OS
     /**
@@ -1514,16 +1605,6 @@ public:
     *                 YOUME_ERROR_SHARE_NO_PERMISSION - 没有共享权限
     */
     YouMeErrorCode checkSharePermission();
-    
-    /**
-     * 开始采集共享区域视频并开始共享, 设置共享视频流采集模式和参数(mac平台)
-     * @param mode: 共享视频采集模式  1：采集设备 2：采集指定窗口 3：采集桌面
-     * @param renderHandle: 共享视频preview窗口句柄，必选
-     * @param captureHandle: 指定需要采集的窗口句柄，采集桌面则可以设置为NULL
-     * @return YOUME_SUCCESS - 成功
-     *          其他 - 具体错误码
-     */
-    YouMeErrorCode StartShareStream(int mode, int windowid);
     
     /**
      * 录屏的时候排除指定窗口
@@ -1540,7 +1621,33 @@ public:
      * @return 无返回码
      */
     void GetWindowInfoList(char *pWinOwner, char *pWinName, int *pWinId, int *winCount);
+
+    /**
+     * 共享屏幕、共享窗口时，绘制边框的开关；在开始共享前调用
+     * @param bEnable:true,共享时绘制边框；false，共享时，不绘制边框
+     * @return 无返回码
+     */
+    void enableShareBorder(bool bEnable);
 #endif
+
+#if defined(OS_LINUX) || defined(MAC_OS) 
+    /**
+     * 开始采集共享区域视频并开始共享, 设置共享视频流采集模式和参数(mac平台)
+     * @param mode: 共享视频采集模式  1：采集设备 2：采集指定窗口 3：采集桌面
+     * @param renderHandle: 共享视频preview窗口句柄，必选
+     * @param captureHandle: 指定需要采集的窗口句柄，采集桌面则可以设置为NULL
+     * @return YOUME_SUCCESS - 成功
+     *          其他 - 具体错误码
+     */
+    YouMeErrorCode StartShareStream(int mode, int windowid);
+#endif
+
+    /**
+     * 结束采集共享区域视频并结束共享
+     * @return 无返回码
+     */
+    void StopShareStream();
+    
     /**
      * 开始屏幕采集并录像
      * @param filePath:录像文件路径，目前只支持mp4格式
@@ -1550,16 +1657,27 @@ public:
     YouMeErrorCode startSaveScreen( const char*  filePath);
     
     /**
-     * 结束采集共享区域视频并结束共享
-     * @return 无返回码
-     */
-    void StopShareStream();
-    
-    /**
      * 停止屏幕采集录像
      * @return 无返回码
      */
     void stopSaveScreen();
+
+	/**
+	* 开始录制本地摄像头、mic
+	* @param filePath:录像文件路径，目前只支持mp4格式
+	* @param enVideo_type:录制文件的类型，例如：只录制camera，或者只录制mic，或者同时录制camera和mic等，具体参考YouMe_LOCAL_RECORD_FILE_TYPE
+	* @param iMaxSize:录制目录最大空间大小，超过则会覆盖，单位M
+    * @param iRecordId:录制文件对应的id，用于关闭
+	* @return YOUME_SUCCESS - 成功
+	*          其他 - 具体错误码
+	*/
+	YouMeErrorCode startLocalRecord(const std::string& filePath, YouMe_LOCAL_RECORD_FILE_TYPE enFile_type, int iMaxSize, int &iRecordId);
+
+	/**
+	* 停止录制本地摄像头、mic
+	* @return 无返回码
+	*/
+	void stopLocalRecord(int iRecordId);
 
     /**
      * 获取共享视频流数据
@@ -1597,7 +1715,16 @@ public:
      * @return 错误码
      */
     YouMeErrorCode translateText(unsigned int* requestID, const char* text, YouMeLanguageCode destLangCode, YouMeLanguageCode srcLangCode);
+
+    YouMeErrorCode inviteSipUser(const char *userId, const char *gatewayUrl);
     
+    /**
+     * 设置视频编码类型，默认h264
+     * @param codecType: 参考YMVideoCodecType
+     * @return YOUME_SUCCESS - 成功
+     * 其他 - 具体错误码
+     */
+    YouMeErrorCode setVideoCodecType(int codecType);
 private:
 
     IYouMeVoiceEngine ();

@@ -102,6 +102,13 @@
 -(void)setServerRegion:(YOUME_RTC_SERVER_REGION_t)serverRegionId regionName:(NSString*)regionName bAppend:(bool)bAppend;
 
 /**
+ *  功能描述:设置服务器部署模式（仅私服/混合部署使用）
+ *  @param deployMode: YOUME_SERVER_DEPLOY_MODE枚举可选的部署模式
+ *  @return 无
+ */
+-(void)setServerDeployMode:(YOUME_SERVER_DEPLOY_MODE_t)deployMode;
+
+/**
  *  功能描述:切换语音输出设备
  *  默认输出到扬声器，在加入房间成功后设置（iOS受系统限制，如果已释放麦克风则无法切换到听筒）
  *
@@ -141,23 +148,51 @@
 /**
  *  功能描述:设置本地连接信息，用于p2p传输，本接口在join房间之前调用
  *
- *  @param strLocalIP:本端ip
- *  @param localPort:本端数据端口
- *  @param remoteIP:远端ip
- *  @param remotePort:远端数据端口
+ *  @param strLocalIP 本端ip
+ *  @param iLocalPort 本端数据端口
+ *  @param strLocalRemoteIP 远端ip
+ *  @param iRemotePort 远端数据端口
  *
  *  @return 错误码，详见YouMeConstDefine.h定义
  */
 -(int)setLocalConnectionInfo:(NSString *)strLocalIP localPort:(int)iLocalPort remoteIP:(NSString *)strLocalRemoteIP remotePort:(int)iRemotePort;
 
 /**
+ *  功能描述:设置本地连接额外信息，用于p2p传输，本接口在join房间之前调用
+ *
+ *  @param bNoSignaling:是否通过mcu管理连接
+ *  @param iConnectTimeout:p2p建立连接过程中超时时间
+ *  @param iKeepaliveTimeout:p2p正在连接过程中超时时间
+ *
+ *  @return 错误码，详见YouMeConstDefine.h定义
+ */
+-(int)setLocalConnectionExtraInfo:(bool)bNoSignaling connectTimeout:(int)iConnectTimeout keepAliveTimeout:(int)iKeepAliveTimeout;
+
+/**
+ *  功能描述:清除本地局域网连接信息，强制server转发
+ *
+ *
+ *  @return 无
+ */
+-(void)clearLocalConnectionInfo;
+
+/**
  *  功能描述:设置是否切换server通路
  *
- *  @param enable: 设置是否切换server通路标志
+ *  @param enable 设置是否切换server通路标志
  *
  *  @return 错误码，详见YouMeConstDefine.h定义
  */
 -(int)setRouteChangeFlag:(bool)enable;
+
+/**
+ *  功能描述:设置视频质量模式
+ *
+ *  @param mode: 0:流畅模式，1:高清模式; 默认流畅模式
+ *
+ *  @return 错误码，详见YouMeConstDefine.h定义
+ */
+-(int)setVideoQualityMode:(int)mode;
 
 /**
  *  功能描述:设置本地预览视图
@@ -255,7 +290,7 @@
  *  @param strUserID 用户ID，要保证全局唯一
  *  @param strChannelID 频道ID，要保证全局唯一
  *  @param userRole 用户角色，用于决定讲话/播放背景音乐等权限
- *  @param bVideoAutoRecv 进入房间后是否自动接收视频
+ *  @param autoRecv 进入房间后是否自动接收视频
  *
  *  @return 错误码，详见YouMeConstDefine.h定义
  */
@@ -279,7 +314,7 @@
  *  @param strChannelID 频道ID，要保证全局唯一
  *  @param userRole 用户角色，用于决定讲话/播放背景音乐等权限
  *  @param joinAppKey 加入房间用额外的appkey
- *  @param bVideoAutoRecv 进入房间后是否自动接收视频
+ *  @param autoRecv 进入房间后是否自动接收视频
  *
  *  @return 错误码，详见YouMeConstDefine.h定义
  */
@@ -315,6 +350,14 @@
 
 /**
  *  功能描述:获取SDK 版本号
+ *
+ *
+ *  @return 字符串版本号
+ */
+- (NSString *)getSdkVersion;
+
+/**
+ *  功能描述:获取SDK 版本号（待废弃）
  *
  *
  *  @return 整形数字版本号
@@ -491,7 +534,7 @@
 
 /**
  *  功能描述: 设置PCM数据回调对象
- *  @param  flag:有3中pcm回调，分别为远端pcm,本地录音pcm及远端和录音的混合pcm。flag用于标记打开哪几种回调，形如PcmCallbackFlag_Remote| PcmCallbackFlag_Record|PcmCallbackFlag_Mix。
+ *  @param  flag 有3中pcm回调，分别为远端pcm,本地录音pcm及远端和录音的混合pcm。flag用于标记打开哪几种回调，形如PcmCallbackFlag_Remote| PcmCallbackFlag_Record|PcmCallbackFlag_Mix。
  *  @param  bOutputToSpeaker 是否扬声器静音:true 不静音;false 静音
  *  @param  nOutputSampleRate pcm callback重采样的采样率
  *  @param  nOutputChannel pcm callback重采样的通道数
@@ -501,7 +544,7 @@
 /**
  *  功能描述: 设置是否回调视频解码前H264数据，需要在加入房间之前设置
  *  @param  enable 是否回调
- *  @param  needDecodeandRender 是否需要解码并渲染:true 需要;false 不需要
+ *  @param  decodeandRender 是否需要解码并渲染:true 需要;false 不需要
  *  @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -645,7 +688,7 @@
 
 /**
  * 录屏的时候排除指定窗口
- * @param windowid: 被排除的窗口id
+ * @param windowid  被排除的窗口id
  * @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -653,6 +696,13 @@
 
 //共享窗口的边框，需要建一个窗口，需要传入一个NSWIndowController;
 -(void) setShareContext:(void*) context;
+
+/**
+ * 共享屏幕、共享窗口时，绘制边框的开关；在开始共享前调用
+ * @param bEnable:true,共享时绘制边框；false，共享时，不绘制边框
+ * @return 无返回码
+ */
+-(void) enableShareBorder:(bool) bEnable;
 
 /**
  * 功能描述:   停止桌面/窗口共享
@@ -748,14 +798,14 @@
 
 /**
  *  功能描述: 获取windows/macos平台cameraId 对应名称
- *  @param  cameraId:摄像头id
+ *  @param  cameraId  摄像头id
  *  @return string - 成功:非空name 失败:空字符串
  */
 - (NSString*) getCameraName:(int)cameraId;
 
 /**
  *  功能描述: 设置windows/macos平台打开摄像头id
- *  @param  cameraId:摄像头id
+ *  @param  cameraId  摄像头id
  *  @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -769,16 +819,23 @@
 
 /**
  *  功能描述: 获取macos平台 record设备 对应信息
- *  @param  index:列表中的位置
- *  @param  deviceName:设备名称
- *  @param  deviceUid:设备唯一ID，用于设置设备
- *  @return string - 成功:非空name 失败:空字符串
+ *  @param  index 列表中的位置
+ *  @param  deviceName 设备名称
+ *  @param  deviceUId 设备唯一ID，用于设置设备
+ *  @return bool true表示成功
  */
 - (boolean_t) getRecordDeviceInfo:(int)index deviceName:(NSString**)deviceName deviceUId:(NSString**)deviceUId;
 
 /**
+ *  功能描述: 获取macos平台 当前record设备 对应信息
+ *  @param  deviceUId 设备唯一ID，用于设置设备
+ *  @return bool true表示成功
+ */
+- (boolean_t) getCurrentRecordDeviceInfo:(NSString**)deviceUId;
+
+/**
  *  功能描述: 设置windows/macos平台打开摄像头id
- *  @param  cameraId:摄像头id
+ *  @param  deviceUId  摄像头id
  *  @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -835,7 +892,7 @@
 
 /**
  *  功能描述: 设置视频平滑开关
- *  @param mode: 0: 关闭；1: 打开平滑
+ *  @param mode  0: 关闭；1: 打开平滑
  *  @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -843,7 +900,7 @@
 
 /**
  *  功能描述: 设置视频上行server反馈
- *  @param mode: 0: 关闭；1: 打开
+ *  @param mode  0: 关闭；1: 打开
  *  @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -883,6 +940,40 @@
  *          其他 - 具体错误码
  */
 - (YouMeErrorCode_t)setVideoNetResolutionWidthForShare:(int)width height:(int)height;
+
+/**
+ * @brief 添加一个simulcast分辨率,当添加第一个的时候,大小流功能失效,用这个来代替大小流
+ *
+ * @param width:宽
+ * @param height:高
+ * @return YOUME_SUCCESS - 成功
+ *          其它 - 具体错误码
+ */
+- (YouMeErrorCode_t)addVideoSimulcastResolution:(int)width height:(int)height;
+
+/**
+ * @brief 关闭simulcast功能
+ *
+ * @return YouMeErrorCode
+ */
+- (YouMeErrorCode_t)clearVideoSimulcastResolution;
+
+/**
+ * @brief 添加一个共享流simulcast分辨率,当添加第一个的时候,大小流功能失效,用这个来代替大小流
+ *
+ * @param width:宽
+ * @param height:高
+ * @return YOUME_SUCCESS - 成功
+ *          其它 - 具体错误码
+ */
+- (YouMeErrorCode_t)addShareSimulcastResolution:(int)width height:(int)height;
+
+/**
+ * @brief 关闭共享流simulcast功能
+ *
+ * @return YouMeErrorCode
+ */
+- (YouMeErrorCode_t)clearShareSimulcastResolution;
 
 /**
  *  功能描述: 设置音视频统计数据时间间隔
@@ -1050,7 +1141,7 @@
 /**
  *  功能描述: 设置多个用户视频信息（支持分辨率）
 *   @param userArray 用户ID列表
- *  @param resolutionArray 用户对应分辨率列表, @"0" 是高清流，@"1"是低清流
+ *  @param resolutionArray 用户对应分辨率列表, @"0":大流 @"1":小流 @"2":共享流 @"3":大流+共享流  @"4":小流+共享流
  *  @return YOUME_SUCCESS - 成功
  *          其他 - 具体错误码
  */
@@ -1228,6 +1319,13 @@
 - (int)enableMainQueueDispatch:(BOOL)enabled;
 
 - (int)enableLocalVideoRender: (bool)enabled;
+
+/**
+ *  功能描述: 停止/恢复发送本地视频流
+ *  @param enabled  0: 正常编码；1: 暂停编码
+ *  @return YOUME_SUCCESS - 成功
+ *          其他 - 具体错误码
+ */
 - (int)enableLocalVideoSend: (bool)enabled;
 
 - (int)muteAllRemoteVideoStreams:(BOOL)mute;
@@ -1327,6 +1425,14 @@
  * @return 错误码
  */
 -(YouMeErrorCode_t) translateText:(unsigned int*) requestID  text:(NSString*)text destLangCode:(YouMeLanguageCode_t)destLangCode srcLangCode:(YouMeLanguageCode_t)srcLangCode;
+
+/*
+ * 设置视频编码类型，默认h264
+ * @param codecType: 参考YMVideoCodecType
+ * @return YOUME_SUCCESS - 成功
+ * 其他 - 具体错误码
+ */
+- (YouMeErrorCode_t) setVideoCodecType:(int) codecType;
 
 /*
 * 功能：获取用于窗口录制的窗口列表信息, 需要先调用checkSharePermission 获取录屏权限，否则10.15+系统无法获取窗口名称，将不返回窗口列表

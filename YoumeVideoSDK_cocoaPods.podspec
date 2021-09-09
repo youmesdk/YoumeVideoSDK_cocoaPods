@@ -11,7 +11,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "YoumeVideoSDK_cocoaPods"
-  spec.version      = "3.4.0.922"
+  spec.version      = "3.4.1.1046"
   spec.summary      = "A short description of YoumeVideoSDK_cocoaPods."
 
   spec.description  = "YoumeVideoSDK_cocoaPods"
@@ -21,10 +21,13 @@ Pod::Spec.new do |spec|
 
 
   spec.author             = { "cwwu" => "871149538@qq.com" }
-  spec.platform     = :ios,"8.0"
+  spec.platform     = :ios,"9.0"
 
   spec.source       = { :git => "https://github.com/youmesdk/YoumeVideoSDK_cocoaPods.git", :tag => "#{spec.version}" }
   spec.requires_arc =true
+
+  s.framework = 'VideoToolbox','AudioToolbox','AVFoundation','CoreTelephony','SystemConfiguration','CFNetwork','CoreFoundation'
+  s.libraries = 'C++','sqlite3.0','z','resolv.9','z.1.2.5'
 
   spec.source_files  = "include/*.{h,m,mm}"
   spec.public_header_files = "include/*.{h}"

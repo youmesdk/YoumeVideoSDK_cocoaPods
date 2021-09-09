@@ -52,5 +52,10 @@ public:
 };
 
 
+class IYouMeAVStatisticNewCallback
+{
+public:
+    virtual void onAVStatisticNew( YouMeAVStatisticType type,  const char* userID,  int value, const char* param) = 0 ;
+};
 
 #endif /* IYouMeFrameCallback_h */
