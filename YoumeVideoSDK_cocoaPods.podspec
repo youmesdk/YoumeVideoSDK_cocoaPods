@@ -26,8 +26,8 @@ Pod::Spec.new do |spec|
   spec.source       = { :git => "https://github.com/youmesdk/YoumeVideoSDK_cocoaPods.git", :tag => "#{spec.version}" }
   spec.requires_arc =true
 
-  s.framework = 'VideoToolbox','AudioToolbox','AVFoundation','CoreTelephony','SystemConfiguration','CFNetwork','CoreFoundation'
-  s.libraries = 'C++','sqlite3.0','z','resolv.9','z.1.2.5'
+  spec.framework = 'VideoToolbox','AudioToolbox','AVFoundation','CoreTelephony','SystemConfiguration','CFNetwork','CoreFoundation'
+  spec.libraries = 'C++','sqlite3.0','z','resolv.9','z.1.2.5'
 
   spec.source_files  = "include/*.{h,m,mm}"
   spec.public_header_files = "include/*.{h}"
