@@ -240,7 +240,23 @@ public:
      *  @return 错误码，详见YouMeConstDefine.h定义
      */
     YouMeErrorCode setVideoQualityMode(int mode);
-    
+
+    /**
+     * 功能描述:设置传输策略
+     * 
+     * @param mode 
+     * @return YouMeErrorCode 
+     */
+    YouMeErrorCode setTransportMode(YoumeTransportProfile mode);
+
+    /**
+     * 功能描述:设置最大重连时间（网络异常时）
+     * 
+     * @param maxReconnectTimeMs: 最大重连时间，单位:ms 
+     * @return 无 
+     */    
+    void setMaxReconnectTime(unsigned int maxReconnectTimeMs);
+
     //---------------------多人语音接口---------------------//
 
     /**
@@ -1435,6 +1451,23 @@ public:
      *  @return void
      */
     void removeAllOverlayVideo();
+
+    /**
+     * 功能描述: 开启画中画模式,摄像头叠加在共享屏幕上面
+     * 
+     * @param w 小图宽
+     * @param h 小图高
+     * @param off_x 小图在大图中的x偏移,左上角为原点 
+     * @param off_y 小图在大图中的y便宜,左上角为原点
+     * @param mode 叠加模式
+     */
+    void enablePictureInPicture(int w, int h, int off_x, int off_y, int mode);
+
+    /**
+     * 功能描述: 关闭画中画模式
+     * 
+     */
+    void disablePictureInPicture();
     
     /**
      *  功能描述: 打开/关闭 外部扩展滤镜回调
@@ -1725,6 +1758,29 @@ public:
      * 其他 - 具体错误码
      */
     YouMeErrorCode setVideoCodecType(int codecType);
+
+    /**
+     * 功能描述: 开启局域网发现,结果由事件回调出来
+     * 
+     * @param nickname 当自己设备被发现时,期望显示的设备名
+     * @return YouMeErrorCode 
+     */
+    YouMeErrorCode startLanDiscovery(const std::string& nickname);
+    
+    /**
+     * 功能描述: 关闭局域网发现
+     * 
+     * @return YouMeErrorCode 
+     */
+    YouMeErrorCode stopLanDiscovery();
+    
+    /**
+     * @brief 
+     * 
+     * @return YouMeErrorCode 
+     */
+    YouMeErrorCode requireKeyFrame();
+
 private:
 
     IYouMeVoiceEngine ();

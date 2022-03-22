@@ -45,6 +45,10 @@ typedef enum YouMeAVStatisticType
     YOUME_AVS_VIDEO_RESOLUTION = 16,            //视频分辨率上报, userid是自己:上行分辨率，userid其它人:下行分辨率
     YOUME_AVS_VIDEO_SHARE_RESOLUTION = 17,      //共享流分辨率上报, userid是自己:上行分辨率，userid其它人:下行分辨率
     YOUME_AVS_SEND_DATA_STAT = 18,              //上行带宽,单位Bps
+    YOUME_AVS_VIDEO_SHARE_CAPTURE_FRAMERATE = 19,       //共享视频采集帧率，userid是自己:采集帧率，userid其它人:解码输入帧率/回调帧率
+    YOUME_AVS_VIDEO_SHARE_MAX_CAPTURE_DELAY = 20,       //共享视频采集最大延时， userid是自己:采集帧间隔，userid其它人:解码输入间隔/回调间隔
+    YOUME_AVS_VIDEO_SHARE_SDK_DELAY = 21,               //共享视频SDK处理耗时，userid是自己:发送端，userid其它人:接收端
+    
 } YouMeAVStatisticType_t;
 
 typedef enum YouMeAudioRouteType
@@ -67,8 +71,8 @@ typedef enum YouMeEvent {
     YOUME_EVENT_RESUMED                      = 7,   ///< 恢复语音频道完成
     YOUME_EVENT_SPEAK_SUCCESS                = 8,   ///< 切换对指定频道讲话成功（适用于多频道模式）
     YOUME_EVENT_SPEAK_FAILED                 = 9,   ///< 切换对指定频道讲话失败（适用于多频道模式）
-    YOUME_EVENT_RECONNECTING                 = 10,  ///< 断网了，正在重连
-    YOUME_EVENT_RECONNECTED                  = 11,  ///< 断网重连成功
+    YOUME_EVENT_RECONNECTING                 = 10,  ///< 断网了，开始重连
+    YOUME_EVENT_RECONNECTED                  = 11,  ///< 断网重连结束, 根据错误码判断重连是否成功
     YOUME_EVENT_REC_PERMISSION_STATUS        = 12,  ///< 通知录音权限状态，成功获取权限时错误码为YOUME_SUCCESS，获取失败为YOUME_ERROR_REC_NO_PERMISSION（此时不管麦克风mute状态如何，都没有声音输出）
     YOUME_EVENT_BGM_STOPPED                  = 13,  ///< 通知背景音乐播放结束
     YOUME_EVENT_BGM_FAILED                   = 14,  ///< 通知背景音乐播放失败
@@ -150,6 +154,8 @@ typedef enum YouMeEvent {
 	YOUME_EVENT_BGM_OR_SPEAR_RECORD          = 76, ///< 背景音乐 或者 内录，同一时间，只能打开一个  
     YOUME_EVENT_AUDIO_ROUTE_CHANGE           = 77, ///< 音频路由改变事件 (YouMeAudioRouteType_t)
 
+    YOUME_EVENT_USER_ROLE_CHANGE             = 100, ///< 远端用户角色改变
+
     YOUME_EVENT_OTHERS_VIDEO_ON              = 200, ///< 收到其它用户的视频流
 
     YOUME_EVENT_MASK_VIDEO_BY_OTHER_USER     = 204, ///< 视频被其他用户屏蔽
@@ -157,8 +163,8 @@ typedef enum YouMeEvent {
     YOUME_EVENT_MASK_VIDEO_FOR_USER          = 206, ///< 屏蔽了谁的视频
     YOUME_EVENT_RESUME_VIDEO_FOR_USER        = 207, ///< 恢复了谁的视频
     YOUME_EVENT_OTHERS_VIDEO_SHUT_DOWN       = 208, ///< 其它用户的视频流断开（包含网络中断的情况）
-    YOUME_EVENT_OTHERS_VIDEO_INPUT_START     = 209, ///< 其他用户视频输入开始（内部采集下开启摄像头/外部输入下开始input）
-    YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP      = 210, ///< 其他用户视频输入停止（内部采集下停止摄像头/外部输入下停止input）
+    YOUME_EVENT_OTHERS_VIDEO_INPUT_START     = 209, ///< 其他用户视频输入开始（内部采集下开启摄像头/外部输入下开始input）
+    YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP      = 210, ///< 其他用户视频输入停止（内部采集下停止摄像头/外部输入下停止input）
     
     YOUME_EVENT_MEDIA_DATA_ROAD_PASS         = 211, ///< 音视频数据通路连通，定时检测，一开始收到数据会收到PASS事件，之后变化的时候会发送
     YOUME_EVENT_MEDIA_DATA_ROAD_BLOCK        = 212, ///< 音视频数据通路不通
@@ -166,8 +172,8 @@ typedef enum YouMeEvent {
     YOUME_EVENT_QUERY_USERS_VIDEO_INFO       = 213, ///< 查询用户视频信息返回
     YOUME_EVENT_SET_USERS_VIDEO_INFO         = 214, ///< 设置用户接收视频信息返回
     
-    YOUME_EVENT_LOCAL_VIDEO_INPUT_START      = 215, ///< 本地视频输入开始（内部采集下开始摄像头/外部输入下开始input）
-    YOUME_EVENT_LOCAL_VIDEO_INPUT_STOP       = 216, ///< 本地视频输入停止（内部采集下停止摄像头/外部输入下停止input）
+    YOUME_EVENT_LOCAL_VIDEO_INPUT_START      = 215, ///< 本地视频输入开始（内部采集下开始摄像头/外部输入下开始input）
+    YOUME_EVENT_LOCAL_VIDEO_INPUT_STOP       = 216, ///< 本地视频输入停止（内部采集下停止摄像头/外部输入下停止input）
     
     YOUME_EVENT_START_PUSH                   = 217, ///< 设置startPush的返回事件
     YOUME_EVENT_SET_PUSH_MIX                 = 218, ///< 设置setPushMix的返回事件
@@ -208,6 +214,7 @@ typedef enum YouMeEvent {
     YOUME_EVENT_RTP_ROUTE_SEREVER            = 601, ///< P2P通路检测失败, 当前通路为server转发
     YOUME_EVENT_RTP_ROUTE_CHANGE_TO_SERVER   = 602, ///< 运行过程中P2P 检测失败，切换到server转发
     YOUME_EVENT_RTP_ROUTE_SERVER_WITH_P2P_PROBE   = 603, ///< server转发模式下，P2P探测成功
+    YOUME_EVENT_LAN_DISCOVERY_NEIGHBOR_LIST  = 650, ///< 局域网发现设备列表
 
     YOUME_EVENT_RECOGNIZE_MODULE_INIT_START  = 700, ///< 语音识别初始化开始
     YOUME_EVENT_RECOGNIZE_MODULE_INIT_END    = 701, ///< 语音识别初始化完成
@@ -220,6 +227,7 @@ typedef enum YouMeEvent {
     YOUME_EVENT_LOCAL_SHARE_WINDOW_ISICONIC  = 727, ///< 共享窗口被最小化
     YOUME_EVENT_LOCAL_SHARE_WINDOW_NORMAL    = 728, ///< 共享窗口恢复正常
 	YOUME_EVENT_LOCAL_SHARE_WINDOW_MOVE		 = 729, ///< 共享窗口位置发生变化
+
 
     YOUME_EVENT_EOF                          = 1000,
     
@@ -261,6 +269,7 @@ typedef enum YouMeErrorCode {
     YOUME_ERROR_DEVICE_NOT_VALID             = -14,  ///< 设置的设备不可用
     YOUME_ERROR_API_NOT_ALLOWED              = -15,  ///< 没有特定功能的权限
     YOUME_ERROR_NO_LANG_CODE                 = -16,  ///< 翻译功能指定了不存在的语言
+    YOUME_ERROR_RECONNECT_TIMEOUT            = -17,  ///< 重连时间超时
 
     // 内部操作错误
     YOUME_ERROR_MEMORY_OUT                   = -100, ///< 内存错误
@@ -296,10 +305,10 @@ typedef enum YouMeErrorCode {
 	YOUME_ERROR_INVITEMIC_REJECT			 = -403, ///< 连麦失败，用户拒绝
 	YOUME_ERROR_INVITEMIC_TIMEOUT			 = -404, ///< 连麦失败，两种情况：1.连麦时，对方超时无应答 2.通话中，双方通话时间到
 
-    YOUME_ERROR_CAMERA_OPEN_FAILED           = -501, ///打开摄像头失败
-    YOUME_ERROR_CAMERA_EXCEPTION             = -502, /// camera设备异常
+    YOUME_ERROR_CAMERA_OPEN_FAILED           = -501, ///< 打开摄像头失败
+    YOUME_ERROR_CAMERA_EXCEPTION             = -502, ///< camera设备异常
 
-	YOUME_ERROR_NOT_PROCESS                  = -601, ///不做任何改变
+	YOUME_ERROR_NOT_PROCESS                  = -601, ///< 不做任何改变
    
     YOUME_ERROR_UNKNOWN                      = -1000,///< 未知错误
 
@@ -421,6 +430,12 @@ typedef enum YOUME_VIDEO_SHARE_TYPE {
     VIDEO_SHARE_TYPE_SCREEN = 3,    // screen capture
     VIDEO_SHARE_TYPE_UNKNOW,
 }YOUME_VIDEO_SHARE_TYPE_t;
+
+typedef enum YOUME_VIDEO_SCREEN_DIRECTION {
+    YOUME_VIDEO_SCREEN_DIRECTION_UNKNOW = 0,
+    YOUME_VIDEO_SCREEN_DIRECTION_PORTRAIT = 1,
+    YOUME_VIDEO_SCREEN_DIRECTION_LANDSCAPE = 2,
+}YOUME_VIDEO_SCREEN_DIRECTION_t;
 
 typedef enum  YouMe_LOCAL_RECORD_VIDEO_TYPE
 {
@@ -619,5 +634,15 @@ typedef enum YMVideoStreamType{
     YOUME_VIDEO_STREAM_MAIN_AND_SHARE,
     YOUME_VIDEO_STREAM_SUB_AND_SHARE,
 }YMVideoStreamType_t;
+
+typedef enum YoumeTransportProfile {
+    YOUME_TRANS_PROFILE_AUTO        = 0,
+    YOUME_TRANS_PROFILE_DOCUMENT    = 1,
+    YOUME_TRANS_PROFILE_VIDEO       = 2,
+    YOUME_TRANS_PROFILE_GAME        = 3,
+    YOUME_TRANS_PROFILE_DELAY_FIRST = 4,
+    YOUME_TRANS_PROFILE_QUALITY_FIRST   = 5,
+    YOUME_TRANS_PROFILE_SMOOTH_FIRST    = 6,
+} YoumeTransportProfile;
 
 #endif // cocos2d_x_sdk_YouMeErrorCode_h

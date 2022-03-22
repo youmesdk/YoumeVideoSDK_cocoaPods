@@ -17,6 +17,8 @@
 @end
 
 @protocol VoiceEngineCallback <NSObject>
+@optional
+
 /**
  *  功能描述: 一般事件通知
  *  @param eventType 事件类型
