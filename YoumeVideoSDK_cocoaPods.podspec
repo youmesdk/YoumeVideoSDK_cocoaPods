@@ -11,7 +11,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "YoumeVideoSDK_cocoaPods"
-  spec.version      = "3.4.1.1113"
+  spec.version      = "3.4.2.1092"
   spec.summary      = "A short description of YoumeVideoSDK_cocoaPods."
 
   spec.description  = "YoumeVideoSDK_cocoaPods"

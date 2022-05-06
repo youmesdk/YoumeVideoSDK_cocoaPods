@@ -25,6 +25,12 @@ typedef enum YouMeUserRole {
     YOUME_USER_GUSET,            ///< 嘉宾，主播或指挥邀请的连麦嘉宾，同一个时刻只能在一个语音频道里面， 可以随时讲话
 } YouMeUserRole_t;
 
+typedef enum YouMeChannelProfile
+{
+    YOUME_RTC_COMMUNICATION = 0,           ///< 通信模式
+    YOUME_LIVE_BROADCASTING = 1,           ///< 直播模式
+} YouMeChannelProfile_t;
+
 typedef enum YouMeAVStatisticType
 {
     YOUME_AVS_AUDIO_CODERATE = 1,               //音频传输码率，userid是自己:上行码率，userid其它人:下行码率，单位Bps
@@ -442,7 +448,7 @@ typedef enum  YouMe_LOCAL_RECORD_VIDEO_TYPE
 	RECORD_TYPE_VIDEO_NONE = 1,//不要录制视频
 	RECORD_TYPE_VIDEO_MAIN ,	//大流
 	RECORD_TYPE_VIDEO_CHILD,		//小流
-};
+}YouMe_LOCAL_RECORD_VIDEO_TYPE_t;
 
 typedef enum  YouMe_LOCAL_RECORD_AUDIO_TYPE
 {
@@ -451,7 +457,7 @@ typedef enum  YouMe_LOCAL_RECORD_AUDIO_TYPE
 	RECORD_TYPE_AUDIO_MUSIC,	//背景音乐
 	RECORD_TYPE_AUDIO_REMOTE,	//远端mix声音
 	RECORD_TYPE_AUDIO_SYSTEM,	//系统声音
-};
+}YouMe_LOCAL_RECORD_AUDIO_TYPE_t;
 
 //录制的文件类型
 typedef enum  YouMe_LOCAL_RECORD_FILE_TYPE
@@ -459,7 +465,7 @@ typedef enum  YouMe_LOCAL_RECORD_FILE_TYPE
 	RECORD_TYPE_FILE_CAMERA_ONLY = 1,//只录制camera
 	RECORD_TYPE_FILE_MIC_ONLY ,	    //只录制mic
 	RECORD_TYPE_FILE_CAMERA_MIC,	//同时录制camera和mic
-};
+}YouMe_LOCAL_RECORD_FILE_TYPE_t;
 
 typedef enum PcmCallBackFlag{
     PcmCallbackFlag_Remote = 0x1,       //远端pcm回调

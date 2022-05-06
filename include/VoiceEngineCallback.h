@@ -14,6 +14,8 @@
 @property (nonatomic, retain) NSString* userID ;
 //true,表示加入，false表示离开
 @property (nonatomic, assign) bool  isJoin;
+// 1:主动离开 2:被动离开
+@property (nonatomic, assign) int leaveType;
 @end
 
 @protocol VoiceEngineCallback <NSObject>
